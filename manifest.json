@@ -1,0 +1,23 @@
+{
+  "name": "Text templetes",
+  "description": "insert template into focused editable element",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage","activeTab", "scripting","clipboardWrite","clipboardRead"],
+  "action": {
+    "default_title": "Show tepmpletes",
+    "default_icon": "icons/icon.png",
+    "default_popup": "popup.html"
+  },
+  "commands": {
+    "open-traslates": {
+      "suggested_key": {
+        "default": "Alt+V"
+      },
+      "description": "Show templetes"
+    }
+  }
+}
