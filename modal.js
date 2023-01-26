@@ -123,6 +123,7 @@
         const title = document.createElement('button');
         title.innerText = templet.title;
         title.onclick = () => {
+            console.log(templet.content);
             enfoqued.innerHTML = templet.content;
             closeModal();
         }
@@ -153,8 +154,8 @@
         modal.appendChild(close);
         const templetesList = document.createElement('ul');
         const allTempletes = await getAllTempletes();
-        allTempletes.map((templet) => {
-            templetesList.appendChild(createTemplete(templet, enfoqued));
+        allTempletes.map((t) => {
+            templetesList.appendChild(createTemplete(t, enfoqued));
         });
         modalContent.appendChild(close);
         modalContent.appendChild(templetesList);
@@ -164,14 +165,6 @@
 
     const closeModal = async () => {
         const modal = document.getElementById('EQ39ModalTempletes');
-        if (modal) {
-            console.log(
-                await saveTemplete({
-                    title: `Prueva v${TEMPLETE_DB_VERSION}`,
-                    content: `Content prueva DB Templete v${TEMPLETE_DB_VERSION}`
-                })
-            );
-        }
         if (modal) document.body.removeChild(modal);
 
     }
