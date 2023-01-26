@@ -3,23 +3,6 @@
     const TEMPLETE_DB_NAME = 'Templetes';
     const TEMPLETE_DB_VERSION = 1;
 
-    /**
-     * get a item the staorage.sync
-     * @param {string: item name in storage} item 
-     * @returns Promise: resolve for item in storage
-     */
-    const getStorage = (item) => {
-        return new Promise((resolve, reject) => {
-            chrome.storage.sync.get(item, (res) => {
-                if (chrome.runtime.lastError)
-                    return reject(chrome.runtime.lastError);
-                else if (res[item])
-                    resolve(res[item]);
-                else resolve([]);
-            });
-        });
-    }
-
     const updateTempleteDB = (db, bk) => {
         console.log(`Upgrading to version ${db.version}`);
 
@@ -39,7 +22,7 @@
                 const db = event.target.db;
                 //console.info(event.target.db);
                 console.log(`initializing DB for version ${db.version}`);
-                
+
                 const getLocalStorage = (item) => {
                     return new Promise((resolve, reject) => {
                         chrome.storage.sync.get(item, (res) => {
@@ -85,11 +68,9 @@
 
             requestV.onsuccess = (event) => {
                 const dbV = event.target.result;
-                console.log(dbV.version);
                 if (newVersion <= dbV.version) return resolve(dbV);
                 else {
                     const trans = dbV.transaction(dbName, 'readwrite');
-                    console.log('readwrite');
                     const store = trans.objectStore(dbName);
                     trans.oncomplete = () => dbV.close();
                     const query = store.getAll();
@@ -108,8 +89,23 @@
         });
     }
 
-    const saveTemplete = (db, templete) => {
+    const getAllTempletes = async () => {
 
+        const db = await getDB(TEMPLETE_DB_NAME, TEMPLETE_DB_VERSION, updateTempleteDB);
+        const trans = db.transaction(TEMPLETE_DB_NAME, 'readwrite');
+        const store = trans.objectStore(TEMPLETE_DB_NAME);
+        trans.oncomplete = () => db.close();
+        const query = store.getAll();
+
+        return new Promise((resolve, reject) => {
+            query.onerror = (event) => reject(`Database error: ${event.target.errorCode}`);
+            query.onsuccess = (event) => resolve(event.target.result);
+        });
+    }
+
+    const saveTemplete = async (templete) => {
+
+        const db = await getDB(TEMPLETE_DB_NAME, TEMPLETE_DB_VERSION, updateTempleteDB);
         const trans = db.transaction(TEMPLETE_DB_NAME, 'readwrite');
         const store = trans.objectStore(TEMPLETE_DB_NAME);
         const query = store.put(templete);
@@ -156,7 +152,7 @@
         close.onclick = closeModal;
         modal.appendChild(close);
         const templetesList = document.createElement('ul');
-        const allTempletes = await getStorage('templetes');
+        const allTempletes = await getAllTempletes();
         allTempletes.map((templet) => {
             templetesList.appendChild(createTemplete(templet, enfoqued));
         });
@@ -169,9 +165,8 @@
     const closeModal = async () => {
         const modal = document.getElementById('EQ39ModalTempletes');
         if (modal) {
-            const db = await getDB(TEMPLETE_DB_NAME, TEMPLETE_DB_VERSION, updateTempleteDB);
             console.log(
-                await saveTemplete(db, {
+                await saveTemplete({
                     title: `Prueva v${TEMPLETE_DB_VERSION}`,
                     content: `Content prueva DB Templete v${TEMPLETE_DB_VERSION}`
                 })
