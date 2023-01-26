@@ -34,18 +34,27 @@
 
             store.createIndex('id', 'id', { unique: true });
 
-            store.transaction.oncomplete = (event) => {
+            store.transaction.oncomplete = async (event) => {
 
                 const db = event.target.db;
                 //console.info(event.target.db);
                 console.log(`initializing DB for version ${db.version}`);
-                console.log(bk);
-
-                const templete = {
-                    title: `Templete v${TEMPLETE_DB_VERSION}`,
-                    content: `Content templete v${TEMPLETE_DB_VERSION}`
+                
+                const getLocalStorage = (item) => {
+                    return new Promise((resolve, reject) => {
+                        chrome.storage.sync.get(item, (res) => {
+                            if (chrome.runtime.lastError)
+                                return reject(chrome.runtime.lastError);
+                            else if (res[item])
+                                resolve(res[item]);
+                            else resolve([]);
+                        });
+                    });
                 }
-                bk.push(templete);
+
+                const templetesLocalStore = await getLocalStorage('templetes');
+
+                templetesLocalStore.forEach((t) => bk.push({ title: t.title, content: t.content }));
 
                 const trans = db.transaction(TEMPLETE_DB_NAME, 'readwrite');
                 const store = trans.objectStore(TEMPLETE_DB_NAME);
@@ -65,7 +74,7 @@
     const getDB = async (dbName, newVersion, updateDB) => {
 
         const databases = await window.indexedDB.databases();
-        
+
         return new Promise((resolve, reject) => {
 
             const requestV = databases.find(i => i.name === dbName)
@@ -160,13 +169,13 @@
     const closeModal = async () => {
         const modal = document.getElementById('EQ39ModalTempletes');
         if (modal) {
-                const db = await getDB(TEMPLETE_DB_NAME, TEMPLETE_DB_VERSION, updateTempleteDB);
-                console.log(
-                    await saveTemplete(db, {
-                        id: 3, title: `Prueva v${TEMPLETE_DB_VERSION}`,
-                        content: `Content prueva DB Templete v${TEMPLETE_DB_VERSION}`
-                    })
-                );
+            const db = await getDB(TEMPLETE_DB_NAME, TEMPLETE_DB_VERSION, updateTempleteDB);
+            console.log(
+                await saveTemplete(db, {
+                    title: `Prueva v${TEMPLETE_DB_VERSION}`,
+                    content: `Content prueva DB Templete v${TEMPLETE_DB_VERSION}`
+                })
+            );
         }
         if (modal) document.body.removeChild(modal);
 
