@@ -26,10 +26,8 @@
                 const getLocalStorage = (item) => {
                     return new Promise((resolve, reject) => {
                         chrome.storage.sync.get(item, (res) => {
-                            if (chrome.runtime.lastError)
-                                return reject(chrome.runtime.lastError);
-                            else if (res[item])
-                                resolve(res[item]);
+                            if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
+                            else if (res[item]) resolve(res[item]);
                             else resolve([]);
                         });
                     });
@@ -45,8 +43,8 @@
                 return Promise.all(bk.map((templete) => {
                     const query = store.add(templete);
                     return new Promise((resolve, reject) => {
-                        query.onsuccess = (event) => resolve(event.target.result);
-                        query.onerror = (event) => reject(`Database error: ${event.target.errorCode}`);
+                        query.onsuccess = (e) => resolve(e.target.result);
+                        query.onerror = (e) => reject(`Database error: ${e.target.errorCode}`);
                     });
                 }));
 
@@ -79,10 +77,8 @@
                         const allTempletes = event.target.result;
                         const requestDB = window.indexedDB.open(dbName, newVersion, updateDB);
                         requestDB.onerror = (event) => reject(`Database error: ${event.target.errorCode}`);
-                        if (updateDB) requestDB.onupgradeneeded = (event) => {
-                            updateDB(event.target.result, allTempletes);
-                        }
-                        requestDB.onsuccess = (event) => resolve(event.target.result);
+                        if (updateDB) requestDB.onupgradeneeded = (e) => updateDB(e.target.result, allTempletes);
+                        requestDB.onsuccess = (e) => resolve(e.target.result);
                     }
                 }
             }
@@ -98,8 +94,8 @@
         const query = store.getAll();
 
         return new Promise((resolve, reject) => {
-            query.onerror = (event) => reject(`Database error: ${event.target.errorCode}`);
-            query.onsuccess = (event) => resolve(event.target.result);
+            query.onerror = (e) => reject(`Database error: ${e.target.errorCode}`);
+            query.onsuccess = (e) => resolve(e.target.result);
         });
     }
 
@@ -111,56 +107,50 @@
         const query = store.put(templete);
 
         return new Promise((resolve, reject) => {
-            query.onsuccess = (event) => { resolve(event.target.result); };
-            query.onerror = (event) => { reject(`Database error: ${event.target.errorCode}`); };
-            trans.oncomplete = () => { db.close() }
+            query.onsuccess = (e) => resolve(e.target.result);
+            query.onerror = (e) => reject(`Database error: ${e.target.errorCode}`);
+            trans.oncomplete = () => db.close();
         });
     }
 
     const createTemplete = (templet, enfoqued) => {
         const item = document.createElement('li');
-        item.id = templet.id;
+        item.id = 'Teid-' + templet.id;
         const title = document.createElement('button');
         title.innerText = templet.title;
         title.onclick = () => {
-            console.log(templet.content);
-            enfoqued.innerHTML = templet.content;
+            enfoqued && (enfoqued.innerHTML = templet.content);
             closeModal();
         }
         item.appendChild(title);
         return item;
-    }
+    }   
 
-    /*
-    <div id="modalTempletes">
-        <ul>
-            <li id="tid0">
-                <button>templete title</button>  
-            </li>
-        </ul>
-    </div>
-    */
     const showModal = async () => {
         const enfoqued = document.body.querySelector('*:focus'); // *::selection
         const modal = document.createElement('div');
         modal.id = 'EQ39ModalTempletes';
         modal.onclick = closeModal;
-        const modalContent = document.createElement('div');
-        modalContent.id = 'EQ39ModalDialog';
-        modalContent.onclick = (e) => e.stopPropagation();
-        const close = document.createElement('button');
-        close.innerText = 'X';
-        close.onclick = closeModal;
-        modal.appendChild(close);
-        const templetesList = document.createElement('ul');
-        const allTempletes = await getAllTempletes();
-        allTempletes.map((t) => {
-            templetesList.appendChild(createTemplete(t, enfoqued));
-        });
-        modalContent.appendChild(close);
-        modalContent.appendChild(templetesList);
-        modal.appendChild(modalContent);
+        modal.innerHTML = 
+        `<div class="dialog">
+            <button>X<button>
+            <header> </header>
+            <ul> </ul>
+            <form>
+                <input type="text">
+                <p contentEditable="true"></p>
+                <input type="submit" value="Add">
+            </form>
+        </div>`;
         document.body.appendChild(modal);
+        const modalContent = modal.querySelector('div.dialog');
+        modalContent.onclick = (e) => e.stopPropagation();
+        const templeteContent = modal.querySelector('div.dialog ul');
+        console.log(templeteContent);
+        const allTempletes = await getAllTempletes();
+        allTempletes.map((t) => templeteContent.appendChild(createTemplete(t, enfoqued)));
+        const close = modal.querySelector('div.dialog > button');        
+        close.onclick = closeModal;
     }
 
     const closeModal = async () => {

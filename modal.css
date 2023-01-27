@@ -10,7 +10,7 @@
   justify-content: center;
 }
 
-#EQ39ModalDialog{
+#EQ39ModalTempletes div.dialog {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -18,7 +18,7 @@
   cursor: default;
 }
 
-#EQ39ModalDialog ul {
+#EQ39ModalTempletes div.dialog ul {
   list-style: none;
 }
 
