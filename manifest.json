@@ -6,12 +6,24 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["storage","activeTab", "scripting","clipboardWrite","clipboardRead"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "clipboardWrite",
+    "clipboardRead"
+  ],
   "action": {
     "default_title": "Show tepmpletes",
     "default_icon": "icons/icon.png",
     "default_popup": "popup.html"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*.svg"],
+      "matches": ["https://nutresa.atlassian.net/*"]
+    }
+  ],
   "commands": {
     "open-traslates": {
       "suggested_key": {

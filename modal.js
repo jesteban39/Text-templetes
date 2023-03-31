@@ -100,7 +100,7 @@
     }
 
     const saveTemplete = async (templete) => {
-
+        console.log(templete);
         const db = await getDB(TEMPLETE_DB_NAME, TEMPLETE_DB_VERSION, updateTempleteDB);
         const trans = db.transaction(TEMPLETE_DB_NAME, 'readwrite');
         const store = trans.objectStore(TEMPLETE_DB_NAME);
@@ -124,15 +124,32 @@
         }
         item.appendChild(title);
         return item;
-    }   
+    }
+
+    /**
+     * Create a new elemnent button icon.
+     * @param {*string: phat of icon} phat 
+     * @param {*function: calback for set onclick} action 
+     * @param {*string: altennative text} alt 
+     * @returns element: a new icon button
+     */
+    const crateIcon = (phat, action, alt = phat) => {
+        const icon = document.createElement('img');
+        icon.src = chrome.runtime.getURL(phat);
+        icon.alt = alt;
+        const iconButton = document.createElement('button');
+        iconButton.onclick = action;
+        iconButton.appendChild(icon);
+        return iconButton;
+    }
 
     const showModal = async () => {
         const enfoqued = document.body.querySelector('*:focus'); // *::selection
         const modal = document.createElement('div');
         modal.id = 'EQ39ModalTempletes';
         modal.onclick = closeModal;
-        modal.innerHTML = 
-        `<div class="dialog">
+        modal.innerHTML =
+            `<div class="dialog">
             <button>X<button>
             <header> </header>
             <ul> </ul>
@@ -149,8 +166,29 @@
         console.log(templeteContent);
         const allTempletes = await getAllTempletes();
         allTempletes.map((t) => templeteContent.appendChild(createTemplete(t, enfoqued)));
-        const close = modal.querySelector('div.dialog > button');        
+        const close = modal.querySelector('div.dialog > button');
         close.onclick = closeModal;
+        const header = modal.querySelector('div.dialog header');
+        const add = crateIcon('icons/add.svg', showNew, 'Add');
+        const submit = modal.querySelector('div.dialog form [type="submit"]');
+        submit.onclick = async (e) => {
+            e.preventDefault();
+            const list = document.querySelector('#EQ39ModalTempletes div.dialog ul');
+            const newT = document.querySelector('#EQ39ModalTempletes div.dialog form');
+            const title = newT.querySelector('[type="text"]');            
+            const content = newT.querySelector('p');
+            await saveTemplete({title: title.value, content: content.innerHTML});
+            list.style = 'display: flex;';
+            newT.style = 'display: none;';
+        }
+        header.appendChild(add);
+    }
+
+    const showNew = (_e) => {
+        const list = document.querySelector('#EQ39ModalTempletes div.dialog ul');
+        const newT = document.querySelector('#EQ39ModalTempletes div.dialog form');
+        list.style = 'display: none;';
+        newT.style = 'display: flex;';
     }
 
     const closeModal = async () => {
