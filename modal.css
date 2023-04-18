@@ -9,9 +9,11 @@
   align-items: center;
   justify-content: center;
 }
+
 #EQ39ModalTempletes header button {
   width: 30%;
   max-width: 6rem;
+  min-width: 3rem;
   padding: 0;
 }
 

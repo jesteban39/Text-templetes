@@ -129,7 +129,7 @@
         if (!child) throw new Error(`Templete with id ${templeteId} not found`);
 
         list.removeChild(child);
-        
+
         const query = store.delete(templeteId);
 
         return new Promise((resolve, reject) => {
@@ -152,8 +152,8 @@
             closeModal();
         }
         item.appendChild(title);
-        
-        const trash = crateIcon('icons/trash.svg',()=>removeTemplete(templete.id), 'trash');
+
+        const trash = crateIcon('icons/trash.svg', () => removeTemplete(templete.id), 'trash');
         item.appendChild(trash);
         return item;
     }
@@ -167,7 +167,7 @@
      */
     const crateIcon = (phat, action, alt = phat) => {
         const iconButton = document.createElement('button');
-        
+
         const icon = document.createElement('img');
         icon.src = chrome.runtime.getURL(phat);
         icon.alt = alt;
@@ -197,7 +197,6 @@
         const modalContent = modal.querySelector('div.dialog');
         modalContent.onclick = (e) => e.stopPropagation();
         const templeteContent = modal.querySelector('div.dialog ul');
-        console.log(templeteContent);
         const allTempletes = await getAllTempletes();
         allTempletes.map((t) => templeteContent.appendChild(createTemplete(t, enfoqued)));
         const close = modal.querySelector('div.dialog > button');
@@ -211,7 +210,10 @@
             const newT = document.querySelector('#EQ39ModalTempletes div.dialog form');
             const title = newT.querySelector('[type="text"]');
             const content = newT.querySelector('p');
-            await saveTemplete({ title: title.value, content: content.innerHTML });
+            const templeteO = { title: title.value, content: content.innerHTML };
+            templeteO.id = await saveTemplete(templeteO);
+            console.log('new DB: ', templeteO);
+            templeteContent.appendChild(createTemplete(templeteO, enfoqued));
             list.style = 'display: flex;';
             newT.style = 'display: none;';
         }
