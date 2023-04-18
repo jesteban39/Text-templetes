@@ -20,22 +20,8 @@
             store.transaction.oncomplete = async (event) => {
 
                 const db = event.target.db;
-                //console.info(event.target.db);
                 console.log(`initializing DB for version ${db.version}`);
-
-                const getLocalStorage = (item) => {
-                    return new Promise((resolve, reject) => {
-                        chrome.storage.sync.get(item, (res) => {
-                            if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
-                            else if (res[item]) resolve(res[item]);
-                            else resolve([]);
-                        });
-                    });
-                }
-
-                const templetesLocalStore = await getLocalStorage('templetes');
-
-                templetesLocalStore.forEach((t) => bk.push({ title: t.title, content: t.content }));
+                if(bk.length === 0) bk.push({ title: 'Click para incertar', content: 'Contenido de la platilla' });
 
                 const trans = db.transaction(TEMPLETE_DB_NAME, 'readwrite');
                 const store = trans.objectStore(TEMPLETE_DB_NAME);
@@ -100,7 +86,6 @@
     }
 
     const saveTemplete = async (templete) => {
-        console.log(templete);
         const db = await getDB(TEMPLETE_DB_NAME, TEMPLETE_DB_VERSION, updateTempleteDB);
         const trans = db.transaction(TEMPLETE_DB_NAME, 'readwrite');
         const store = trans.objectStore(TEMPLETE_DB_NAME);
@@ -118,8 +103,6 @@
      * @param {string: item id to remove} templeteId 
      */
     const removeTemplete = async (templeteId) => {
-        console.log('delete', templeteId);
-
         const db = await getDB(TEMPLETE_DB_NAME, TEMPLETE_DB_VERSION, updateTempleteDB);
         const trans = db.transaction(TEMPLETE_DB_NAME, 'readwrite');
         const store = trans.objectStore(TEMPLETE_DB_NAME);
@@ -212,7 +195,6 @@
             const content = newT.querySelector('p');
             const templeteO = { title: title.value, content: content.innerHTML };
             templeteO.id = await saveTemplete(templeteO);
-            console.log('new DB: ', templeteO);
             templeteContent.appendChild(createTemplete(templeteO, enfoqued));
             title.value = '';
             content.innerHTML = '';
