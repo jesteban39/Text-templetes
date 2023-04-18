@@ -9,6 +9,17 @@
   align-items: center;
   justify-content: center;
 }
+#EQ39ModalTempletes header button {
+  width: 30%;
+  max-width: 6rem;
+  padding: 0;
+}
+
+#EQ39ModalTempletes header button img {
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
 
 #EQ39ModalTempletes div.dialog {
   display: flex;
@@ -22,10 +33,31 @@
   list-style: none;
   display: flex;
   flex-direction: column;
+  padding: 0;
+  margin: 0;
 }
 
 li button:hover {
   background-color: rgb(137, 254, 104);
+}
+
+#EQ39ModalTempletes div.dialog ul li {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#EQ39ModalTempletes div.dialog ul li button {
+  height: 100%;
+  padding: 0;
+}
+
+#EQ39ModalTempletes div.dialog ul li button img {
+  height: 100%;
+  width: auto;
+  max-width: 1.5rem;
+  margin: 0;
 }
 
 #EQ39ModalTempletes div.dialog form {

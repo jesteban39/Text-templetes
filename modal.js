@@ -113,16 +113,48 @@
         });
     }
 
-    const createTemplete = (templet, enfoqued) => {
+    /**
+     * remove a Templete
+     * @param {string: item id to remove} templeteId 
+     */
+    const removeTemplete = async (templeteId) => {
+        console.log('delete', templeteId);
+
+        const db = await getDB(TEMPLETE_DB_NAME, TEMPLETE_DB_VERSION, updateTempleteDB);
+        const trans = db.transaction(TEMPLETE_DB_NAME, 'readwrite');
+        const store = trans.objectStore(TEMPLETE_DB_NAME);
+
+        const list = document.querySelector('#EQ39ModalTempletes div.dialog ul');
+        const child = document.getElementById('Teid-' + templeteId);
+        if (!child) throw new Error(`Templete with id ${templeteId} not found`);
+
+        list.removeChild(child);
+        
+        const query = store.delete(templeteId);
+
+        return new Promise((resolve, reject) => {
+            query.onsuccess = (e) => {
+                resolve(e.target.result);
+            }
+            query.onerror = (e) => reject(`Database error: ${e.target.errorCode}`);
+            trans.oncomplete = () => db.close();
+        });
+
+    }
+
+    const createTemplete = (templete, enfoqued) => {
         const item = document.createElement('li');
-        item.id = 'Teid-' + templet.id;
+        item.id = 'Teid-' + templete.id;
         const title = document.createElement('button');
-        title.innerText = templet.title;
+        title.innerText = templete.title;
         title.onclick = () => {
-            enfoqued && (enfoqued.innerHTML = templet.content);
+            enfoqued && (enfoqued.innerHTML = templete.content);
             closeModal();
         }
         item.appendChild(title);
+        
+        const trash = crateIcon('icons/trash.svg',()=>removeTemplete(templete.id), 'trash');
+        item.appendChild(trash);
         return item;
     }
 
@@ -134,12 +166,14 @@
      * @returns element: a new icon button
      */
     const crateIcon = (phat, action, alt = phat) => {
+        const iconButton = document.createElement('button');
+        
         const icon = document.createElement('img');
         icon.src = chrome.runtime.getURL(phat);
         icon.alt = alt;
-        const iconButton = document.createElement('button');
-        iconButton.onclick = action;
         iconButton.appendChild(icon);
+
+        iconButton.onclick = action;
         return iconButton;
     }
 
@@ -175,9 +209,9 @@
             e.preventDefault();
             const list = document.querySelector('#EQ39ModalTempletes div.dialog ul');
             const newT = document.querySelector('#EQ39ModalTempletes div.dialog form');
-            const title = newT.querySelector('[type="text"]');            
+            const title = newT.querySelector('[type="text"]');
             const content = newT.querySelector('p');
-            await saveTemplete({title: title.value, content: content.innerHTML});
+            await saveTemplete({ title: title.value, content: content.innerHTML });
             list.style = 'display: flex;';
             newT.style = 'display: none;';
         }
@@ -194,7 +228,6 @@
     const closeModal = async () => {
         const modal = document.getElementById('EQ39ModalTempletes');
         if (modal) document.body.removeChild(modal);
-
     }
     showModal();
 })();

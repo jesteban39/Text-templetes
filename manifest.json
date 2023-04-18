@@ -21,7 +21,7 @@
   "web_accessible_resources": [
     {
       "resources": ["icons/*.svg"],
-      "matches": ["https://nutresa.atlassian.net/*"]
+      "matches": ["https://nutresa.atlassian.net/*","https://mail.google.com/*"]
     }
   ],
   "commands": {
