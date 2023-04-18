@@ -214,6 +214,8 @@
             templeteO.id = await saveTemplete(templeteO);
             console.log('new DB: ', templeteO);
             templeteContent.appendChild(createTemplete(templeteO, enfoqued));
+            title.value = '';
+            content.innerHTML = '';
             list.style = 'display: flex;';
             newT.style = 'display: none;';
         }
