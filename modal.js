@@ -4,9 +4,9 @@
     const TEMPLETE_DB_VERSION = 1;
 
     const updateTempleteDB = (db, bk) => {
-        console.log(`Upgrading to version ${db.version}`);
 
-        if (db.objectStoreNames.contains(TEMPLETE_DB_NAME)) db.deleteObjectStore(TEMPLETE_DB_NAME);
+        if (db.objectStoreNames.contains(TEMPLETE_DB_NAME))
+            db.deleteObjectStore(TEMPLETE_DB_NAME);
 
         if (!db.objectStoreNames.contains(TEMPLETE_DB_NAME)) {
 
@@ -21,7 +21,10 @@
 
                 const db = event.target.db;
                 console.log(`initializing DB for version ${db.version}`);
-                if(bk.length === 0) bk.push({ title: 'Click para incertar', content: 'Contenido de la platilla' });
+                if (bk.length === 0) bk.push({
+                    title: 'Click aqui para insertar',
+                    content: 'Contenido de la plantilla insertado.'
+                });
 
                 const trans = db.transaction(TEMPLETE_DB_NAME, 'readwrite');
                 const store = trans.objectStore(TEMPLETE_DB_NAME);
@@ -165,13 +168,14 @@
         const modal = document.createElement('div');
         modal.id = 'EQ39ModalTempletes';
         modal.onclick = closeModal;
-        modal.innerHTML =
-            `<div class="dialog">
+        modal.innerHTML = `<div class="dialog">
             <button>X<button>
             <header> </header>
             <ul> </ul>
             <form>
+                <span>Titulo</span>
                 <input type="text">
+                <span>Contenido</span>
                 <p contentEditable="true"></p>
                 <input type="submit" value="Add">
             </form>
