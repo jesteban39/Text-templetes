@@ -28,12 +28,12 @@ chrome.commands.onCommand.addListener(incerTemplet);
 
 /*
 "permissions": ["storage", "activeTab", "scripting"],
- 
-      "windows": "Alt+V",
-      "mac": "Alt+V",
-      "chromeos": "Alt+V",
-      "linux": "Alt+V"
 
-      Item.textContent = 'No hay notas almacenadas.';
+    "windows": "Alt+V",
+    "mac": "Alt+V",
+    "chromeos": "Alt+V",
+    "linux": "Alt+V"
+
+    Item.textContent = 'No hay notas almacenadas.';
 
 */
